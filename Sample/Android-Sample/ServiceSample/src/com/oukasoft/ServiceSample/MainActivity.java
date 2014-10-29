@@ -12,8 +12,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -23,6 +25,8 @@ public class MainActivity extends Activity {
 	LinearLayout ll;
     Button btnStart;
     Button btnStop;
+    ListView lv;
+    ArrayAdapter<String> adapter;;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +42,22 @@ public class MainActivity extends Activity {
 		TextView textView1 = (TextView)findViewById(R.id.textView1);  
         textView1.setText("GPS情報取得:");  
         
-		// /////////////////////////////////
-		// GPS
+		/*
+		 *  ListView
+		 */
+
+		lv = (ListView) findViewById(R.id.listView1);
+
+		adapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_expandable_list_item_1);
+		
+		adapter.add( "List View");
+
+		lv.setAdapter(adapter);
+		
+		/*
+		 * GPS
+		 */
 		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 		// 位置情報の要求条件を指定する
@@ -59,11 +77,14 @@ public class MainActivity extends Activity {
 				1, // リスナーに通知する最小距離間隔
 				locationListener); // リスナー
 		
+		
+		
+		
+        
 	}
     
   //位置情報を画面に表示  
     private void showLocation(Location location) {  
-        TextView textView2 = (TextView)findViewById(R.id.textView2);  
           
         StringBuffer sb = new StringBuffer();  
           
@@ -77,8 +98,11 @@ public class MainActivity extends Activity {
             sb.append("進行方向：").append(location.getBearing());  
             //sb.append("プロバイダ：").append(location.getProvider());  
         }  
-          
-        textView2.setText(sb.toString());  
+        
+        Log.d("gps", sb.toString());
+        
+        adapter.add( sb.toString());
+    
     }  
       
     private LocationListener locationListener = new LocationListener() {  

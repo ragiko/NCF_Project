@@ -39,4 +39,14 @@
         android:layout_marginTop="14dp"
         android:text="TextView" />
 
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_below="@+id/textView2"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="47dp" >
+    </ListView>
+
 </RelativeLayout>
