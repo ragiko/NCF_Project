@@ -1,7 +1,14 @@
 package com.parse.starter;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +16,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -18,6 +26,47 @@ import android.widget.Toast;
 public class GpsService extends Service {
 	
 	private LocationManager locationManager;
+	private Location _location;
+	private List<ParseObject> todos;
+	
+	private class RemoteDataTask extends AsyncTask<Void, Void, Void> {
+		// Override this method to do custom remote calls
+		protected Void doInBackground(Void... params) {
+			// Gets the current list of todos in sorted order
+			ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Tag");
+			query.orderByDescending("_created_at");
+
+			try {
+				todos = query.find();
+			} catch (ParseException e) {
+
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+		}
+
+		@Override
+		protected void onProgressUpdate(Void... values) {
+			super.onProgressUpdate(values);
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			if (todos != null) {
+				// for (ParseObject todo : todos) {
+				// Log.d("RemoteDataTask", ((String) todo.get("name")));
+				// }
+                Log.i("RemoteDataTask", "インサート成功");
+            }
+			else {
+				 Log.i("RemoteDataTask", "インサート失敗");
+			}
+		}
+	}
 
 	@Override
 	public void onCreate() {
@@ -38,15 +87,15 @@ public class GpsService extends Service {
 		criteria.setAltitudeRequired(true); // 標高を取得するかどうか
 		criteria.setBearingRequired(true); // 進行方向を取得するかどうか
 		criteria.setCostAllowed(false); // 取得費用がかかることを許可するかどうか
-		criteria.setPowerRequirement(Criteria.POWER_LOW); // 消費電力量を指定する
+		criteria.setPowerRequirement(Criteria.POWER_HIGH); // 消費電力量を指定する
 		criteria.setSpeedRequired(true); // 速度を取得するかどうか
 
 		// 指定する取得条件でプロバイダーを取得
 		String provider = locationManager.getBestProvider(criteria, true);
 
 		// ロケーションリスナーを設定
-		locationManager.requestLocationUpdates(provider, 1000, // リスナーに通知する最小時間間隔
-				1, // リスナーに通知する最小距離間隔
+		locationManager.requestLocationUpdates(provider, 5000, // リスナーに通知する最小時間間隔
+				0.1f, // リスナーに通知する最小距離間隔
 				locationListener); // リスナーØ
         
         return START_STICKY;
@@ -68,6 +117,23 @@ public class GpsService extends Service {
           
         //位置情報が変更されたときに呼び出される  
         public void onLocationChanged(Location location) {  
+        	_location = location;
+        	
+        	new RemoteDataTask() {
+    			protected Void doInBackground(Void... params) {
+    				ParseGeoPoint point = new ParseGeoPoint(_location.getLatitude(), _location.getLongitude());
+    				ParseObject todo = new ParseObject("Tag");
+    				todo.put("location", point);
+    				try {
+    					todo.save();
+    				} catch (ParseException e) {
+    				}
+
+    				super.doInBackground();
+    				return null;
+    			}
+    		}.execute();
+    		
             showLocation(location);  
         }  
     };

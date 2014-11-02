@@ -1,7 +1,10 @@
 package com.parse.starter;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,11 +12,18 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import com.parse.ParseAnalytics;
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 public class ParseStarterProjectActivity extends Activity {
 	
-	Button btnStart;
-    Button btnStop;
+	private Button btnStart;
+    private Button btnStop;
+    
+    
+    
     
 	/** Called when the activity is first created. */
 	public void onCreate(Bundle savedInstanceState) {
@@ -25,6 +35,8 @@ public class ParseStarterProjectActivity extends Activity {
 
 		btnStart.setOnClickListener(new ServiceOnClickListener());
 		btnStop.setOnClickListener(new ServiceOnClickListener());
+		
+		
 
 		ParseAnalytics.trackAppOpened(getIntent());
 	}
