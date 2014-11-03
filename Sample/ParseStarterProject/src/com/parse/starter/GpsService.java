@@ -1,13 +1,6 @@
 package com.parse.starter;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 
 import android.app.Service;
 import android.content.Context;
@@ -18,10 +11,15 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 public class GpsService extends Service {
 	
@@ -124,6 +122,10 @@ public class GpsService extends Service {
     				ParseGeoPoint point = new ParseGeoPoint(_location.getLatitude(), _location.getLongitude());
     				ParseObject todo = new ParseObject("Tag");
     				todo.put("location", point);
+    				
+    				ParseUser user = ParseUser.getCurrentUser();
+    				todo.put("user", user);
+    	    		
     				try {
     					todo.save();
     				} catch (ParseException e) {
